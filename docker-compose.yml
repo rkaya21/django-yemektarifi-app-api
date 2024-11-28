@@ -11,4 +11,27 @@ services:
     volumes:
       - ./app:/app
     command: >
-      sh -c "cd /app && python manage.py runserver 0.0.0.0:8000"
+      sh -c "cd /app &&
+             python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=recdb
+      - DB_USER=recuser
+      - DB_PASS=recpass
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=recdb
+      - POSTGRES_USER=recuser
+      - POSTGRES_PASSWORD=recpass
+
+
+volumes:
+  dev-db-data:
