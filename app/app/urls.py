@@ -6,7 +6,7 @@ The `urlpatterns` list routes URLs to views. For more information, please see:
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
@@ -35,4 +35,5 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name='api-schema'),
         name='api-redoc',
     ),
+    path('api/user/', include('user.urls')),
 ]
