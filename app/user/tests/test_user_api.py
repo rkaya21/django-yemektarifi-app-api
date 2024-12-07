@@ -11,7 +11,7 @@ from rest_framework import status
 
 CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
-PROFILE_ENDPOİNT = reverse('user:me')
+PROFILE_ENDPOINT = reverse('user:me')
 
 
 def create_user(**params):
@@ -82,7 +82,7 @@ class PublicUserApiTests(TestCase):
             'email': 'test@gmail.com',
             'password': 'password123',
         }
-        get_user_model().objects.create(**user_details)
+        create_user(**user_details)
 
         payload = {
             'email': user_details['email'],
@@ -133,7 +133,7 @@ class PublicUserApiTests(TestCase):
         """
         Test that the profile endpoint returns 401 Unauthorized.
         """
-        res = self.client.get(PROFILE_ENDPOİNT)
+        res = self.client.get(PROFILE_ENDPOINT)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -150,11 +150,11 @@ class PrivateUserApiTest(TestCase):
             name='Test Name',
         )
         self.client = APIClient()
-        self.client.force_authentication(user=self.user)
+        self.client.force_authenticate(user=self.user)
 
     def test_retrieve_profile_success(self):
         """Test retrieving profile for logged in user."""
-        res = self.client.get(PROFILE_ENDPOİNT)
+        res = self.client.get(PROFILE_ENDPOINT)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, {
             'name': self.user.name,
@@ -164,7 +164,7 @@ class PrivateUserApiTest(TestCase):
     def test_post_me_not_allowed(self):
         """Test POST is not allowed for the me endpoint."""
 
-        res = self.client.post(PROFILE_ENDPOİNT, {})
+        res = self.client.post(PROFILE_ENDPOINT, {})
 
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -173,7 +173,7 @@ class PrivateUserApiTest(TestCase):
 
         payload = {'name': 'Updated name', 'password': 'newpassword123'}
 
-        res = self.client.patch(PROFILE_ENDPOİNT, payload)
+        res = self.client.patch(PROFILE_ENDPOINT, payload)
 
         self.user.refresh_from_db()
         self.assertEqual(self.user.name, payload['name'])
