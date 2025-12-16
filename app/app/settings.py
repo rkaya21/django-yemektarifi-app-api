@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-%#!k4tet8ziupipkiaaz7)q1i2$b%(16q3=)og!x4*e7(_=_v#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -137,4 +137,7 @@ AUTH_USER_MODEL = 'core.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
 }
