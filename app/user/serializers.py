@@ -1,32 +1,31 @@
 """
 Serializers for the user API View.
 """
-from django.contrib.auth import (
-    get_user_model,
-    authenticate,
-)
-from django.utils.translation import gettext as _
 
+from typing import Any, Dict
+
+from django.contrib.auth import authenticate, get_user_model
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer[Any]):  # type: ignore[misc]
     """Serializer for the user object."""
 
     class Meta:
         model = get_user_model()
-        fields = ['email', 'password', 'name']
-        extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
+        fields = ["email", "password", "name"]
+        extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
 
-    def create(self, validated_data):
+    def create(self, validated_data: Dict[str, Any]) -> Any:
         """Create and return user with encrypted pw."""
         return get_user_model().objects.create_user(**validated_data)
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Any, validated_data: Dict[str, Any]) -> Any:
         """
         Update and return user.
         """
-        password = validated_data.pop('password', None)
+        password = validated_data.pop("password", None)
         user = super().update(instance, validated_data)
 
         if password:
@@ -36,26 +35,27 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class AuthTokenSerializer(serializers.Serializer):
+class AuthTokenSerializer(serializers.Serializer[Any]):  # type: ignore[misc]
     """The user auth token."""
+
     email = serializers.EmailField()
     password = serializers.CharField(
-        style={'input type': 'password'},
+        style={"input type": "password"},
         trim_whitespace=False,
     )
 
-    def validate(self, attrs):
+    def validate(self, attrs: Dict[str, Any]) -> Dict[str, Any]:
         """Validate and authanticate for users"""
-        email = attrs.get('email')
-        password = attrs.get('password')
+        email = attrs.get("email")
+        password = attrs.get("password")
         user = authenticate(
-            request=self.context.get('request'),
+            request=self.context.get("request"),
             username=email,
             password=password,
         )
         if not user:
-            msg = _('Unable to authanticate with provided credentials.')
-            raise serializers.ValidationError(msg, code='authorization')
+            msg = _("Unable to authanticate with provided credentials.")
+            raise serializers.ValidationError(msg, code="authorization")
 
-        attrs['user'] = user
+        attrs["user"] = user
         return attrs

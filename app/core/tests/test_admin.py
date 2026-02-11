@@ -1,47 +1,45 @@
 """
 Tests for the admin modifications.
 """
-from django.test import TestCase
+
 from django.contrib.auth import get_user_model
+from django.test import Client, TestCase
 from django.urls import reverse
-from django.test import Client
 
 
 class AdminSiteTests(TestCase):
     """Tests for Admin."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Create user and client."""
         self.client = Client()
         self.admin_user = get_user_model().objects.create_superuser(
-            email='admin@gmail.com',
-            password='testpassword123',
+            email="admin@gmail.com",
+            password="testpassword123",
         )
         self.client.force_login(self.admin_user)
         self.user = get_user_model().objects.create_user(
-            email='user@gmail.com',
-            password='testpassword123',
-            name='Test User'
+            email="user@gmail.com", password="testpassword123", name="Test User"
         )
 
-    def test_users_list(self):
+    def test_users_list(self) -> None:
         """Check that page lists all users."""
-        url = reverse('admin:core_user_changelist')
+        url = reverse("admin:core_user_changelist")
         res = self.client.get(url)
 
         self.assertContains(res, self.user.name)
         self.assertContains(res, self.user.email)
 
-    def test_edit_user_page(self):
+    def test_edit_user_page(self) -> None:
         """Test the edit user page works."""
-        url = reverse('admin:core_user_change', args=[self.user.id])
+        url = reverse("admin:core_user_change", args=[self.user.id])
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, 200)
 
-    def test_create_user_page(self):
+    def test_create_user_page(self) -> None:
         """Test create user page works."""
-        url = reverse('admin:core_user_add')
+        url = reverse("admin:core_user_add")
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, 200)
