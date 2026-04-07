@@ -7,17 +7,19 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ─── Security ────────────────────────────────────────────────────────────────
-
-SECRET_KEY = os.environ.get("SECRET_KEY", "")
-if not SECRET_KEY:
-    raise ValueError("SECRET_KEY environment variable is not set.")
+# Security
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
+SECRET_KEY = os.environ.get("SECRET_KEY", "")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-dev-only"
+    else:
+        raise ValueError("SECRET_KEY environment variable is not set.")
 
 ALLOWED_HOSTS: list[str] = os.environ.get("ALLOWED_HOSTS", "").split(",")
 
-# ─── Applications ─────────────────────────────────────────────────────────────
+# Applications
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -65,7 +67,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "app.wsgi.application"
 
-# ─── Database ─────────────────────────────────────────────────────────────────
+# Database
 
 DATABASES = {
     "default": {
@@ -77,7 +79,7 @@ DATABASES = {
     }
 }
 
-# ─── Authentication ───────────────────────────────────────────────────────────
+# Authentication
 
 AUTH_USER_MODEL = "core.User"
 
@@ -97,7 +99,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# ─── REST Framework ───────────────────────────────────────────────────────────
+# REST Framework
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -106,7 +108,7 @@ REST_FRAMEWORK = {
     ),
 }
 
-# ─── Internationalization ─────────────────────────────────────────────────────
+# Internationalization
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
@@ -114,7 +116,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# ─── Static & Media ───────────────────────────────────────────────────────────
+# Static and media
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -122,11 +124,11 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# ─── Default PK ───────────────────────────────────────────────────────────────
+# Default PK
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ─── Logging ──────────────────────────────────────────────────────────────────
+# Logging
 
 LOGGING = {
     "version": 1,
