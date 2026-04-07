@@ -4,7 +4,7 @@
 Database models.
 """
 
-from typing import Any
+from typing import Any, Optional
 
 from django.conf import settings
 from django.contrib.auth.models import (
@@ -19,7 +19,7 @@ class UserManager(BaseUserManager["User"]):
     """User Administrator."""
 
     def create_user(
-        self, email: str, password: str | None = None, **extra_fields: Any
+        self, email: str, password: Optional[str] = None, **extra_fields: Any
     ) -> "User":
         """Create, save and return a new user."""
         if not email:
@@ -30,7 +30,9 @@ class UserManager(BaseUserManager["User"]):
 
         return user
 
-    def create_superuser(self, email: str, password: str | None = None) -> "User":
+    def create_superuser(
+        self, email: str, password: Optional[str] = None
+    ) -> "User":
         """Create and return new superuser."""
         user = self.create_user(email, password)
         user.is_staff = True
