@@ -8,16 +8,16 @@ services:
       - "8000:8000"
     volumes:
       - ./app:/app
+      - dev-media-data:/app/media
     command: >
       sh -c "cd /app &&
              python manage.py wait_for_db &&
              python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
+    env_file:
+      - .env
     environment:
       - DB_HOST=db
-      - DB_NAME=recdb
-      - DB_USER=recuser
-      - DB_PASS=recpass
     depends_on:
       - db
 
@@ -25,11 +25,14 @@ services:
     image: postgres:13-alpine
     volumes:
       - dev-db-data:/var/lib/postgresql/data
+    env_file:
+      - .env
     environment:
-      - POSTGRES_DB=recdb
-      - POSTGRES_USER=recuser
-      - POSTGRES_PASSWORD=recpass
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
 
 
 volumes:
   dev-db-data:
+  dev-media-data:

@@ -4,12 +4,29 @@
 
 # Docker
 .docker
+docker-compose*.yml
 
 # Python
-app/__pycache__/
-app/*/__pycache__/
-app/*/*/__pycache__/
-app/*/*/*/__pycache__/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
 .env/
 .venv/
 venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Environment
+.env
+.env.*
+
+# OS
+.DS_Store
+
+# Docs & CI
+README.md
+.github/
+docs/

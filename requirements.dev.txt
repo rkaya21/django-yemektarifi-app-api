@@ -1,2 +1,3 @@
-flake8>=3.9.2,<3.10
-djangorestframework-simplejwt
+# Kept for backward compatibility.
+# Use requirements/dev.txt directly.
+-r requirements/dev.txt
