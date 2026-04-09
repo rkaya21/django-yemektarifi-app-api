@@ -180,3 +180,6 @@ static_collected/
 # Secrets
 *.pem
 *.key
+
+# Local planning notes
+.todo.md
