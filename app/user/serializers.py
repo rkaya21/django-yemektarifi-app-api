@@ -45,7 +45,7 @@ class AuthTokenSerializer(serializers.Serializer[Any]):  # type: ignore[misc]
     )
 
     def validate(self, attrs: Dict[str, Any]) -> Dict[str, Any]:
-        """Validate and authanticate for users"""
+        """Validate and authenticate users."""
         email = attrs.get("email")
         password = attrs.get("password")
         user = authenticate(
@@ -54,7 +54,7 @@ class AuthTokenSerializer(serializers.Serializer[Any]):  # type: ignore[misc]
             password=password,
         )
         if not user:
-            msg = _("Unable to authanticate with provided credentials.")
+            msg = _("Unable to authenticate with provided credentials.")
             raise serializers.ValidationError(msg, code="authorization")
 
         attrs["user"] = user

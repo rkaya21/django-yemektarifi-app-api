@@ -5,6 +5,7 @@ Tests for the user API.
 from typing import Any, Dict
 
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -24,6 +25,7 @@ class PublicUserApiTests(TestCase):
     """Test the public features of the user API."""
 
     def setUp(self) -> None:
+        cache.clear()
         self.client = APIClient()
 
     def test_create_user_success(self) -> None:
@@ -134,6 +136,20 @@ class PublicUserApiTests(TestCase):
         self.assertNotIn("token", data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_token_rate_limited(self) -> None:
+        """
+        Test the token endpoint is throttled after ten requests.
+        """
+        payload = {"email": "test@example.com", "password": "pass123"}
+
+        for _ in range(10):
+            res = self.client.post(TOKEN_URL, payload)
+            self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        res = self.client.post(TOKEN_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
+
     def test_user_access_requires_authentication(self) -> None:
         """
         Test that the profile endpoint returns 401 Unauthorized.
@@ -149,6 +165,7 @@ class PrivateUserApiTest(TestCase):
     """
 
     def setUp(self) -> None:
+        cache.clear()
         self.user = create_user(
             email="test@example.com",
             password="testpass123",

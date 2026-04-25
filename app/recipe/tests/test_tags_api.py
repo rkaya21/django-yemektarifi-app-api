@@ -2,7 +2,7 @@
 Test for the tags API endpoints.
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from core.models import Tag
 from django.contrib.auth import get_user_model
@@ -57,7 +57,14 @@ class PrivateTagsApiTests(TestCase):
         serializer = TagSerializer(tags, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)  # type: ignore[attr-defined]
+        self.assertIn("count", res.data)  # type: ignore[attr-defined]
+        self.assertIn("next", res.data)  # type: ignore[attr-defined]
+        self.assertIn("previous", res.data)  # type: ignore[attr-defined]
+        self.assertEqual(res.data["count"], tags.count())  # type: ignore[index]
+        self.assertEqual(  # type: ignore[index]
+            res.data["results"],
+            serializer.data,
+        )
 
     def test_tags_limited_to_user(self) -> None:
         """Test list of tags is limited to authenticated user."""
@@ -66,13 +73,13 @@ class PrivateTagsApiTests(TestCase):
         tag = Tag.objects.create(user=self.user, name="Comfort Food")
 
         res = self.client.get(TAGS_URL)
-        # res.data'nın tipini belirterek ve Mypy'ı susturarak hatayı giderdik
-        data: List[Dict[str, Any]] = res.data  # type: ignore[attr-defined]
+        data: Dict[str, Any] = res.data  # type: ignore[attr-defined]
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["name"], tag.name)
-        self.assertEqual(data[0]["id"], tag.id)
+        self.assertEqual(data["count"], 1)
+        self.assertEqual(len(data["results"]), 1)
+        self.assertEqual(data["results"][0]["name"], tag.name)
+        self.assertEqual(data["results"][0]["id"], tag.id)
 
     def test_update_tag(self) -> None:
         """Test updating a tag."""

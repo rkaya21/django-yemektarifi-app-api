@@ -72,7 +72,14 @@ class PrivateRecipeApiTests(TestCase):
         recipes = Recipe.objects.all().order_by("-id")
         serializer = RecipeSerializer(recipes, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)  # type: ignore[attr-defined]
+        self.assertIn("count", res.data)  # type: ignore[attr-defined]
+        self.assertIn("next", res.data)  # type: ignore[attr-defined]
+        self.assertIn("previous", res.data)  # type: ignore[attr-defined]
+        self.assertEqual(res.data["count"], recipes.count())  # type: ignore[index]
+        self.assertEqual(  # type: ignore[index]
+            res.data["results"],
+            serializer.data,
+        )
 
     def test_recipe_list_limited_to_user(self) -> None:
         """
@@ -88,7 +95,11 @@ class PrivateRecipeApiTests(TestCase):
         recipes = Recipe.objects.filter(user=self.user)
         serializer = RecipeSerializer(recipes, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)  # type: ignore[attr-defined]
+        self.assertEqual(res.data["count"], recipes.count())  # type: ignore[index]
+        self.assertEqual(  # type: ignore[index]
+            res.data["results"],
+            serializer.data,
+        )
 
     def test_get_recipe_detail(self) -> None:
         """Test get recipe detail."""
