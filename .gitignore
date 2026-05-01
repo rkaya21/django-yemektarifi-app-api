@@ -139,6 +139,7 @@ venv.bak/
 
 # mkdocs documentation
 /site
+/tasks
 
 # mypy
 .mypy_cache/
@@ -183,3 +184,6 @@ static_collected/
 
 # Local planning notes
 .todo.md
+
+# Claude Code
+CLAUDE.md

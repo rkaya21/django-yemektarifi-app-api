@@ -26,7 +26,7 @@ class RecipeViewSet(viewsets.ModelViewSet[Recipe]):  # type: ignore[misc]
 
     def get_serializer_class(self) -> Any:
         """Return appropriate serializer class."""
-        if self.action == "list":
+        if self.action == "retrieve":
             return serializers.RecipeDetailSerializer
 
         return self.serializer_class
