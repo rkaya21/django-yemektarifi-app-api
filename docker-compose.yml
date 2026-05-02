@@ -16,7 +16,7 @@ services:
              python manage.py runserver 0.0.0.0:8000"
     environment:
       - DEBUG=${DEBUG:-True}
-      - SECRET_KEY=${SECRET_KEY}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
       - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-app.settings}
       - DB_HOST=${DB_HOST:-db}

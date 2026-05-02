@@ -7,6 +7,8 @@ jobs:
   test-lint:
     name: Test and Lint
     runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: dev-secret-key
 
     steps:
       - name: Login to Docker Hub
