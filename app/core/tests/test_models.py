@@ -75,6 +75,8 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(recipe), recipe.title)
+        self.assertIsNotNone(recipe.created_at)
+        self.assertIsNotNone(recipe.updated_at)
 
     def test_create_tag(self) -> None:
         """Test creating a tag is successful."""
@@ -82,3 +84,5 @@ class ModelTests(TestCase):
         tag = models.Tag.objects.create(user=user, name="Tag1")
 
         self.assertEqual(str(tag), tag.name)
+        self.assertIsNotNone(tag.created_at)
+        self.assertIsNotNone(tag.updated_at)

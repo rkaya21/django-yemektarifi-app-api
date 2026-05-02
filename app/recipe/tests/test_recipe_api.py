@@ -259,3 +259,57 @@ class PrivateRecipeApiTests(TestCase):
                 user=self.user,
             ).exists()
             self.assertTrue(exists)
+
+    def test_filter_recipes_by_tags(self) -> None:
+        """Test filtering recipes by tag."""
+        recipe1 = create_recipe(user=self.user, title="Recipe 1")
+        recipe2 = create_recipe(user=self.user, title="Recipe 2")
+        tag1 = Tag.objects.create(user=self.user, name="Dinner")
+        tag2 = Tag.objects.create(user=self.user, name="Lunch")
+        recipe1.tags.add(tag1)
+        recipe2.tags.add(tag2)
+
+        res = self.client.get(RECIPES_URL, {"tags": tag1.id})
+
+        serializer = RecipeSerializer([recipe1], many=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data["count"], 1)  # type: ignore[index]
+        self.assertEqual(res.data["results"], serializer.data)  # type: ignore[index]
+
+    def test_search_recipes(self) -> None:
+        """Test searching recipes by title and description."""
+        recipe1 = create_recipe(
+            user=self.user,
+            title="Thai Coconut Curry",
+            description="Curry with coconut milk",
+        )
+        recipe2 = create_recipe(
+            user=self.user,
+            title="Avocado Toast",
+            description="Breakfast with avocado",
+        )
+
+        res = self.client.get(RECIPES_URL, {"search": "coconut"})
+
+        serializer = RecipeSerializer([recipe1], many=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data["count"], 1)  # type: ignore[index]
+        self.assertEqual(res.data["results"], serializer.data)  # type: ignore[index]
+
+        res = self.client.get(RECIPES_URL, {"search": "toast"})
+        serializer = RecipeSerializer([recipe2], many=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data["count"], 1)  # type: ignore[index]
+        self.assertEqual(res.data["results"], serializer.data)  # type: ignore[index]
+
+    def test_ordering_recipes(self) -> None:
+        """Test ordering recipes by time."""
+        create_recipe(user=self.user, title="Recipe 1", time_minutes=20)
+        create_recipe(user=self.user, title="Recipe 2", time_minutes=10)
+
+        res = self.client.get(RECIPES_URL, {"ordering": "time_minutes"})
+
+        recipes = Recipe.objects.filter(user=self.user).order_by("time_minutes")
+        serializer = RecipeSerializer(recipes, many=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data["results"], serializer.data)  # type: ignore[index]

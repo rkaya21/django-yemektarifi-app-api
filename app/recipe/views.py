@@ -6,8 +6,9 @@ Views for the recipe APIs.
 from typing import Any
 
 from core.models import Recipe, Tag
+from django_filters.rest_framework import DjangoFilterBackend
 from recipe import serializers
-from rest_framework import mixins, viewsets
+from rest_framework import filters, mixins, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
@@ -19,6 +20,14 @@ class RecipeViewSet(viewsets.ModelViewSet[Recipe]):  # type: ignore[misc]
     queryset = Recipe.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_fields = ["tags"]
+    search_fields = ["title", "description"]
+    ordering_fields = ["id", "title", "time_minutes", "price"]
 
     def get_queryset(self) -> Any:
         """Return recipes for the authenticated user only."""
@@ -37,6 +46,7 @@ class RecipeViewSet(viewsets.ModelViewSet[Recipe]):  # type: ignore[misc]
 
 
 class TagViewSet(
+    mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
     mixins.UpdateModelMixin,
     mixins.ListModelMixin,
@@ -52,3 +62,7 @@ class TagViewSet(
     def get_queryset(self) -> Any:
         """Return tags for the authenticated user only."""
         return self.queryset.filter(user=self.request.user).order_by("-name")
+
+    def perform_create(self, serializer: serializers.TagSerializer) -> None:
+        """Create a new tag for the authenticated user."""
+        serializer.save(user=self.request.user)
